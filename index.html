@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>WallToWall</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas"></canvas>
+      <div id="unity-loading-bar">
+        <div id="company-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+        <div id="unity-progress-text" class="dark">0%</div>
+      </div>
+    </div>
+    <!-- VK SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@vkontakte/vk-bridge@2.0.8/dist/index.umd.js"></script>
+    <script src='external.js'></script>
+    <script>
+      // parse url params
+      //let src = document.getElementsByClassName('app_container')[0].childNodes[0].src;
+      //let src = document.getElementsByClassName('app_container')[0].src;
+      //let src = document.getElementById("app_7970234_container").childNodes[0].src
+      //let url = new URL(src);
+      //const apps_init = url.searchParams;
+
+      const currentIframeHref = new URL(document.location.href);
+      
+      console.log(currentIframeHref);
+      console.log(currentIframeHref.searchParams.get('access_token'));
+      
+      console.log(document.location.href.searchParams);
+      
+      InitVK();
+    </script>
+    <script>
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/Build.asm.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/Build.data",
+        frameworkUrl: buildUrl + "/Build.asm.framework.js",
+        codeUrl: buildUrl + "/Build.asm.js",
+        memoryUrl: buildUrl + "/Build.asm.mem",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "OurLastSpring",
+        productName: "WallToWall",
+        productVersion: "0.1",
+      };
+
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var progressText = document.querySelector("#unity-progress-text");
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        container.className = "unity-mobile";
+        config.devicePixelRatio = 1;
+      }
+      loadingBar.style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          var displayProgress = (100 * (progress / 0.9));
+          if(displayProgress > 100) {
+            displayProgress = 100;
+          }
+          progressBarFull.style.width = displayProgress + "%";
+          progressText.innerHTML = Math.round(displayProgress) + "%";
+        }).then((unityInstance) => {
+          window.unityInstance = unityInstance;
+          loadingBar.style.display = "none";
+        }).catch((message) => {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>
